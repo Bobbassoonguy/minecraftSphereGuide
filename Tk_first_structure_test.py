@@ -90,7 +90,8 @@ class Window(Frame):
         scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
         scroll_y.grid(row=0, column=1, sticky=NS)
         self.canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-        self.canvas.configure(scrollregion=(0,0,self.canvasWidth,self.canvasHeight))
+        # self.canvas.configure(scrollregion=self.canvas.bbox("all"))  ##TODO fix scrolling
+        self.canvas.configure(scrollregion=(0,0,self.canvasWidth,self.canvasHeight))  ##TODO fix scrolling
         self.canvas.grid()
 
 
