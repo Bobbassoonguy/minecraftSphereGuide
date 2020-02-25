@@ -1,5 +1,13 @@
 import math
 import random
 
-for x in range(1, 1000):
-    print("Carson is a math guy")
+
+def circle(radius):
+    print(radius)
+    r2 = radius**2
+    for z in range(0, radius):
+        z2 = z**2
+        dist = r2-z2
+
+
+circle(5)
