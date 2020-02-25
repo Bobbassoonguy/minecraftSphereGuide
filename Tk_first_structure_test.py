@@ -13,6 +13,10 @@ class Window(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         self.master = master
+
+        self.canvasZoom = 20 # Pixels per square in the grid
+        self.gridSize = [50,50] # number of squares in the grid
+
         self.init_window()
 
     #Creation of init_window
@@ -33,37 +37,46 @@ class Window(Frame):
         topLabel.pack()
 
         self.drawBlankCanvas()
+        self.drawCanvasGrid()
 
 
     def drawBlankCanvas(self):
         self.canvasFrame = Frame(self,bd=10,relief=SUNKEN)
-        canvas = Canvas(self.canvasFrame, width=1500, height=1500, bg='white')
-        canvas.create_oval(10, 10, 20, 20, fill="red")
-        canvas.create_oval(200, 200, 220, 220, fill="blue")
-        canvas.create_oval(1400, 1400, 1410, 1410, fill="green")
-        canvas.grid(row=0, column=0)
+        self.canvasWidth = (self.canvasZoom * self.gridSize[0])    # - 8
+        self.canvasHeight = (self.canvasZoom * self.gridSize[1])    # - 5
+        self.canvas = Canvas(self.canvasFrame, width=self.canvasWidth, height=self.canvasHeight, bg='white')
 
-        scroll_x = Scrollbar(self.canvasFrame, orient="horizontal", command=canvas.xview)
+        #self.canvas.create_rectangle(0,0,self.canvasWidth,self.canvasHeight,fill='red')
+
+        self.canvas.grid(row=0, column=0)
+
+        scroll_x = Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
         scroll_x.grid(row=1, column=0, sticky=EW)
 
-        scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=canvas.yview)
+        scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
         scroll_y.grid(row=0, column=1, sticky=NS)
 
-        canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-        canvas.configure(scrollregion=canvas.bbox("all"))
-
-        canvas.grid()
+        self.canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+        self.canvas.configure(scrollregion=self.canvas.bbox("all")) ##TODO fix scrolling
+        self.canvas.grid()
 
         self.canvasFrame.columnconfigure(0, weight=1)
         self.canvasFrame.rowconfigure(0, weight=1)
         self.canvasFrame.pack(fill=X)
 
-
+    def drawCanvasGrid(self):
+        fillColor = "#cccccc"
+        for x in range(0, self.gridSize[0]+1):
+            line = self.canvas.create_line(x*self.canvasZoom, 0, x*self.canvasZoom, self.canvasHeight,width=1,fill=fillColor)
+        for y in range(0, self.gridSize[1]+1):
+            line = self.canvas.create_line(0,y*self.canvasZoom, self.canvasWidth, y*self.canvasZoom, width=1,fill=fillColor)
 
 root = Tk()
 
 #size of the window
-root.geometry("800x800")
+
 
 app = Window(root)
+rootSize = str(900) + "x" + str(900)
+root.geometry(rootSize)
 root.mainloop()
