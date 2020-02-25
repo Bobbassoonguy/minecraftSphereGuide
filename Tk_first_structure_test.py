@@ -6,7 +6,7 @@ LABEL_FONT = ("Times","30","bold")
 
 ## This commit is from my laptop
 
-
+##alex is a potato
 
 
 class Window(Frame):
