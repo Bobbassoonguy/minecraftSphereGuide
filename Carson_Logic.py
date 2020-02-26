@@ -16,4 +16,5 @@ def circle(radius):
         x = math.sqrt(x2)
 
 
+print("Do the thing")
 circle(5)
