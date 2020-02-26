@@ -31,7 +31,7 @@ class Window(Frame):
 
         #Label
 
-        labelText = "Minecraft Sphere Calculator"
+        labelText = "Sphere Calculator"
         if random.randint(0,200) == 0:
             labelText = "MINCERAFT Sphere Calculator"
 
@@ -65,7 +65,7 @@ class Window(Frame):
         self.canvasFrame.rowconfigure(0, weight=1)
 
     def drawCanvasFrame(self):
-        self.canvasFrame = Frame(self, bd=10, relief=SUNKEN)
+        self.canvasFrame = Frame(self, bd=10, relief=SUNKEN,bg="blue")
         self.canvasFrame.grid(row=2)
 
         # give priority to the size of canvasFrame in root grid
@@ -80,66 +80,50 @@ class Window(Frame):
         self.canvas.yview(SCROLL, scroll, UNITS)
 
     def resizeCanvas(self, event):
-        # print("resize")
-        usableWidth = event.width - 70
-        if abs(usableWidth - self.canvasWidth) > 20: ## re-draw the canvas if there are these many pixels of room
-            self.canvasZoom = round(usableWidth / self.gridSize[0])
-            self.canvasWidth = (self.canvasZoom * self.gridSize[0])
-            self.canvasHeight = (self.canvasZoom * self.gridSize[1])
+        self.windowWidth = event.width - 70
+        if abs(self.windowWidth - self.canvasWidth) > 20: ## re-draw the canvas if there are these many pixels of room
+            self.canvasZoom = round(self.windowWidth / self.gridSize[0])
 
-            for i in self.canvas.find_all():
-                self.canvas.delete(i)
-            self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
-            self.canvasScrolling()
+            self.updateCanvasSize()
 
-            self.drawCanvasAxes()
-            self.drawCanvasGrid()
-            self.drawRectangleHere(100,100)
+    def updateCanvasSize(self):
+        self.canvasWidth = (self.canvasZoom * self.gridSize[0])
+        self.canvasHeight = (self.canvasZoom * self.gridSize[1])
+        self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
+        for i in self.canvas.find_all():
+            self.canvas.delete(i)
+        self.canvasScrolling()
+        self.drawCanvasAxes()
+        self.drawCanvasGrid()
 
     def canvasScrolling(self):
-        scroll_x = Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
-        scroll_x.grid(row=1, column=0, sticky=EW)
-        scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
-        scroll_y.grid(row=0, column=1, sticky=NS)
-        self.canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+        self.scroll_x = Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
+        self.scroll_x.grid(row=1, column=0, sticky=EW)
+        self.scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
+        self.scroll_y.grid(row=0, column=1, sticky=NS)
+        self.canvas.configure(yscrollcommand=self.scroll_y.set, xscrollcommand=self.scroll_x.set)
         self.canvas.configure(scrollregion=(0, 0, self.canvasWidth,self.canvasHeight))
         self.canvas.grid()
 
     def canvasZoomButtons(self): #TODO "fill" frame button
         self.canvasZoomButtonFrame = Frame(self.canvasFrame)
         self.canvasZoomButtonFrame.grid(column=2, row=0, sticky=N)
-        zoomIn = Button(self.canvasZoomButtonFrame,text="+", width=3, font=BUTTON_FONT, command=self.zoomIn)
-        zoomOut = Button(self.canvasZoomButtonFrame, text="-", width=3, font=BUTTON_FONT, command=self.zoomOut)
-        zoomIn.pack()
-        zoomOut.pack()
+        self.zoomInButton = Button(self.canvasZoomButtonFrame,text="+", width=3, font=BUTTON_FONT, command=self.zoomIn)
+        self.zoomOutButton = Button(self.canvasZoomButtonFrame, text="-", width=3, font=BUTTON_FONT, command=self.zoomOut)
+        self.zoomInButton.pack()
+        self.zoomOutButton.pack()
 
-    def zoomIn(self): #TODO refactor repition out of zoomIn, zoomOut, and resizeCanvas, they all use similar code
+    def zoomIn(self):
         self.canvasZoom += 1
-        self.canvasWidth = (self.canvasZoom * self.gridSize[0])
-        self.canvasHeight = (self.canvasZoom * self.gridSize[1])
+        self.updateCanvasSize()
 
-        for i in self.canvas.find_all():
-            self.canvas.delete(i)
-        self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
-        self.canvasScrolling()
-
-        self.drawCanvasAxes()
-        self.drawCanvasGrid()
-        self.drawRectangleHere(100, 100)
-
-    def zoomOut(self): #TODO if canvas is already zoomed out, dont get smaller.
-        self.canvasZoom -= 1
-        self.canvasWidth = (self.canvasZoom * self.gridSize[0])
-        self.canvasHeight = (self.canvasZoom * self.gridSize[1])
-
-        for i in self.canvas.find_all():
-            self.canvas.delete(i)
-        self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
-        self.canvasScrolling()
-
-        self.drawCanvasAxes()
-        self.drawCanvasGrid()
-        self.drawRectangleHere(100, 100)
+    def zoomOut(self): #TODO if canvas is already zoomed out, dont get smaller. Use widths to change sizes
+        print("App Width: " + str(self.winfo_width()))
+        print("CanvasFrame width - scrollbarWidth - buttonWidth: " + str(self.canvasFrame.winfo_width()-self.zoomInButton.winfo_width()-self.scroll_y.winfo_width()))
+        print("Canvas width: " + str(self.canvas.winfo_width()))
+        if abs(self.winfo_width() - self.canvasFrame.winfo_width()) > 10:
+            self.canvasZoom -= 1
+            self.updateCanvasSize()
 
 
     def drawCanvasGrid(self):
