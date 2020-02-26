@@ -3,6 +3,7 @@ import random
 
 
 LABEL_FONT = ("Times","30","bold")
+BUTTON_FONT = ("Times","15")
 
 ## This commit is from my laptop
 
@@ -15,7 +16,8 @@ class Window(Frame):
         Frame.__init__(self, master)
         self.master = master
 
-        self.gridSize = [258,258] # number of squares in the grid
+        # self.gridSize = [258,258] # number of squares in the grid
+        self.gridSize = [72, 72]  # number of squares in the grid
 
         self.init_window()
 
@@ -41,9 +43,14 @@ class Window(Frame):
         self.canvasZoom = 20
 
         self.bind("<Configure>", self.resizeCanvas)
+
         self.drawCanvasFrame()
         self.createBlankCanvas()
+        self.canvas.bind("<MouseWheel>", self.mouseWheel)
+
         self.canvasScrolling()
+        self.canvasZoomButtons()
+
         self.drawCanvasAxes()
         self.drawCanvasGrid()
 
@@ -56,12 +63,6 @@ class Window(Frame):
         # set the canvas as the size priority in the canvasFrame
         self.canvasFrame.columnconfigure(0, weight=1)
         self.canvasFrame.rowconfigure(0, weight=1)
-        #
-        # #TODO remove these shapes, for testing only
-        # self.canvas.create_oval(10, 10, 20, 20, fill="red")
-        # self.canvas.create_oval(200, 200, 220, 220, fill="blue")
-        # # self.canvas.create_oval(1400, 1400, 1410, 1410, fill="green")
-
 
     def drawCanvasFrame(self):
         self.canvasFrame = Frame(self, bd=10, relief=SUNKEN)
@@ -71,10 +72,17 @@ class Window(Frame):
         self.rowconfigure(2, weight=1)
         self.columnconfigure(0, weight=1)
 
+    def mouseWheel(self, event):
+        scroll = event.delta
+        if abs(scroll) > 100:
+            scroll = -1 * int(scroll / 120)
+
+        self.canvas.yview(SCROLL, scroll, UNITS)
+
     def resizeCanvas(self, event):
-        print("resize")
-        usableWidth = event.width - 50
-        if abs(usableWidth - self.canvasWidth) > 20:
+        # print("resize")
+        usableWidth = event.width - 70
+        if abs(usableWidth - self.canvasWidth) > 20: ## re-draw the canvas if there are these many pixels of room
             self.canvasZoom = round(usableWidth / self.gridSize[0])
             self.canvasWidth = (self.canvasZoom * self.gridSize[0])
             self.canvasHeight = (self.canvasZoom * self.gridSize[1])
@@ -96,6 +104,43 @@ class Window(Frame):
         self.canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
         self.canvas.configure(scrollregion=(0, 0, self.canvasWidth,self.canvasHeight))
         self.canvas.grid()
+
+    def canvasZoomButtons(self): #TODO "fill" frame button
+        self.canvasZoomButtonFrame = Frame(self.canvasFrame)
+        self.canvasZoomButtonFrame.grid(column=2, row=0, sticky=N)
+        zoomIn = Button(self.canvasZoomButtonFrame,text="+", width=3, font=BUTTON_FONT, command=self.zoomIn)
+        zoomOut = Button(self.canvasZoomButtonFrame, text="-", width=3, font=BUTTON_FONT, command=self.zoomOut)
+        zoomIn.pack()
+        zoomOut.pack()
+
+    def zoomIn(self): #TODO refactor repition out of zoomIn, zoomOut, and resizeCanvas, they all use similar code
+        self.canvasZoom += 1
+        self.canvasWidth = (self.canvasZoom * self.gridSize[0])
+        self.canvasHeight = (self.canvasZoom * self.gridSize[1])
+
+        for i in self.canvas.find_all():
+            self.canvas.delete(i)
+        self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
+        self.canvasScrolling()
+
+        self.drawCanvasAxes()
+        self.drawCanvasGrid()
+        self.drawRectangleHere(100, 100)
+
+    def zoomOut(self): #TODO if canvas is already zoomed out, dont get smaller.
+        self.canvasZoom -= 1
+        self.canvasWidth = (self.canvasZoom * self.gridSize[0])
+        self.canvasHeight = (self.canvasZoom * self.gridSize[1])
+
+        for i in self.canvas.find_all():
+            self.canvas.delete(i)
+        self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
+        self.canvasScrolling()
+
+        self.drawCanvasAxes()
+        self.drawCanvasGrid()
+        self.drawRectangleHere(100, 100)
+
 
     def drawCanvasGrid(self):
         fillColor = "#cccccc"
@@ -129,7 +174,7 @@ class Window(Frame):
             print("Both?")
             origin = self.canvas.create_rectangle((self.canvasWidth / 2) - (self.canvasZoom / 2), (self.canvasHeight / 2) - (self.canvasZoom / 2), (self.canvasWidth / 2) + (self.canvasZoom / 2), (self.canvasHeight / 2) + (self.canvasZoom / 2), fill="#cce0ff", width=0)
 
-    def drawRectangleHere(self,x,y,color="red"):
+    def drawRectangleHere(self,x,y,color="red"): #TODO create new coordinate system. Origin at center? how to translate to in-game coords?
         border = 2
         self.canvas.create_rectangle(x+border,y+border,(x+self.canvasZoom)-border,(y+self.canvasZoom)-border,fill="red", width=0)
 
