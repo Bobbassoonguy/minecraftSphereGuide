@@ -15,7 +15,7 @@ class Window(Frame):
         Frame.__init__(self, master)
         self.master = master
 
-        self.gridSize = [30,30] # number of squares in the grid
+        self.gridSize = [258,258] # number of squares in the grid
 
         self.init_window()
 
@@ -40,36 +40,36 @@ class Window(Frame):
         self.canvasHeight = 0
         self.canvasZoom = 20
 
-        self.drawBlankCanvas()
         self.bind("<Configure>", self.resizeCanvas)
-
+        self.drawCanvasFrame()
+        self.createBlankCanvas()
+        self.canvasScrolling()
+        self.drawCanvasAxes()
         self.drawCanvasGrid()
 
 
 
-    def drawBlankCanvas(self):
-        self.canvasFrame = Frame(self,bd=10,relief=SUNKEN)
-        self.canvasFrame.grid(row=2)
-        self.rowconfigure(2, weight=1)
-        self.columnconfigure(0, weight=1)
-
-        # self.canvasZoom = 20  # Pixels per square in the grid
-        # Pixels per square in the grid = width of grid space / gridsize x
-        # self.canvasZoom = self.grid_bbox(column=0,row=2)[2]/self.gridSize[0]
+    def createBlankCanvas(self):
         self.canvas = Canvas(self.canvasFrame, width=self.canvasWidth, height=self.canvasHeight, bg='white')
-
-        self.canvas.create_oval(10, 10, 20, 20, fill="red")
-        self.canvas.create_oval(200, 200, 220, 220, fill="blue")
-        self.canvas.create_oval(1400, 1400, 1410, 1410, fill="green")
-        # self.canvas.create_rectangle(0,0,self.canvasWidth,self.canvasHeight,fill='red')
-
         self.canvas.grid(row=0, column=0)
 
-        self.canvasScrolling()
-
+        # set the canvas as the size priority in the canvasFrame
         self.canvasFrame.columnconfigure(0, weight=1)
         self.canvasFrame.rowconfigure(0, weight=1)
+        #
+        # #TODO remove these shapes, for testing only
+        # self.canvas.create_oval(10, 10, 20, 20, fill="red")
+        # self.canvas.create_oval(200, 200, 220, 220, fill="blue")
+        # # self.canvas.create_oval(1400, 1400, 1410, 1410, fill="green")
 
+
+    def drawCanvasFrame(self):
+        self.canvasFrame = Frame(self, bd=10, relief=SUNKEN)
+        self.canvasFrame.grid(row=2)
+
+        # give priority to the size of canvasFrame in root grid
+        self.rowconfigure(2, weight=1)
+        self.columnconfigure(0, weight=1)
 
     def resizeCanvas(self, event):
         print("resize")
@@ -79,11 +79,14 @@ class Window(Frame):
             self.canvasWidth = (self.canvasZoom * self.gridSize[0])
             self.canvasHeight = (self.canvasZoom * self.gridSize[1])
 
-            # self.canvasFrame.destroy() ##TODO Figure out why when x is smaller than y, canvases layer. Figure out how to kill canvas properly
-            self.drawBlankCanvas()
-            # self.drawCanvasGrid()
+            for i in self.canvas.find_all():
+                self.canvas.delete(i)
+            self.canvas.configure(width=self.canvasWidth, height=self.canvasHeight)
+            self.canvasScrolling()
 
-
+            self.drawCanvasAxes()
+            self.drawCanvasGrid()
+            self.drawRectangleHere(100,100)
 
     def canvasScrolling(self):
         scroll_x = Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
@@ -91,18 +94,44 @@ class Window(Frame):
         scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
         scroll_y.grid(row=0, column=1, sticky=NS)
         self.canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-        # self.canvas.configure(scrollregion=self.canvas.bbox("all"))  ##TODO fix scrolling
-        self.canvas.configure(scrollregion=(0,0,self.canvasWidth,self.canvasHeight))  ##TODO fix scrolling
+        self.canvas.configure(scrollregion=(0, 0, self.canvasWidth,self.canvasHeight))
         self.canvas.grid()
-
 
     def drawCanvasGrid(self):
         fillColor = "#cccccc"
-        for x in range(0, self.gridSize[0]+1):
-            line = self.canvas.create_line(x*self.canvasZoom, 0, x*self.canvasZoom, self.canvasHeight,width=1,fill=fillColor)
-        for y in range(0, self.gridSize[1]+1):
-            line = self.canvas.create_line(0,y*self.canvasZoom, self.canvasWidth, y*self.canvasZoom, width=1,fill=fillColor)
-        border = self.canvas.create_rectangle(0,0,self.canvasHeight,self.canvasWidth,outline='Orange',width=2)
+        for x in range(0, self.gridSize[0] + 1):
+            if x != self.gridSize[0] / 2:
+                line = self.canvas.create_line(x * self.canvasZoom, 0, x * self.canvasZoom, self.canvasHeight, width=1,
+                                           fill=fillColor)
+        for y in range(0, self.gridSize[1] + 1):
+            if y != self.gridSize[1] / 2:
+                line = self.canvas.create_line(0, y * self.canvasZoom, self.canvasWidth, y * self.canvasZoom, width=1,
+                                           fill=fillColor)
+        border = self.canvas.create_rectangle(0, 0, self.canvasHeight, self.canvasWidth, outline='Orange', width=2)
+
+    def drawCanvasAxes(self):
+        if self.gridSize[0] % 2 == 0:
+            yAxis = self.canvas.create_line(self.canvasWidth / 2, 0, self.canvasWidth / 2, self.canvasHeight, width=1,
+                                            fill="#00cc00")
+        else:
+            yAxis = self.canvas.create_rectangle((self.canvasWidth / 2) - (self.canvasZoom / 2), 0,
+                                                 (self.canvasWidth / 2) + (self.canvasZoom / 2), self.canvasHeight,
+                                                 fill="#e6ffe6", width=0)
+        if self.gridSize[1] % 2 == 0:
+            xAxis = self.canvas.create_line(0, self.canvasHeight / 2, self.canvasWidth, self.canvasHeight / 2, width=1,
+                                            fill="red")
+        else:
+            xAxis = self.canvas.create_rectangle(0, (self.canvasHeight / 2) - (self.canvasZoom / 2), self.canvasWidth,
+                                                 (self.canvasHeight / 2) + (self.canvasZoom / 2), fill="#ffe6e6",
+                                                 width=0)
+
+        if self.gridSize[0] % 2 != 0 and self.gridSize[1] % 2 != 0:
+            print("Both?")
+            origin = self.canvas.create_rectangle((self.canvasWidth / 2) - (self.canvasZoom / 2), (self.canvasHeight / 2) - (self.canvasZoom / 2), (self.canvasWidth / 2) + (self.canvasZoom / 2), (self.canvasHeight / 2) + (self.canvasZoom / 2), fill="#cce0ff", width=0)
+
+    def drawRectangleHere(self,x,y,color="red"):
+        border = 2
+        self.canvas.create_rectangle(x+border,y+border,(x+self.canvasZoom)-border,(y+self.canvasZoom)-border,fill="red", width=0)
 
 root = Tk()
 
