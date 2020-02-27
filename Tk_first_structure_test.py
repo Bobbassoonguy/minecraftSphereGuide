@@ -17,7 +17,7 @@ class Window(Frame):
         self.master = master
 
         # self.gridSize = [258,258] # number of squares in the grid
-        self.gridSize = [72, 72]  # number of squares in the grid
+        self.gridSize = [200, 200]  # number of squares in the grid
 
         self.init_window()
 
@@ -42,11 +42,13 @@ class Window(Frame):
         self.canvasHeight = 0
         self.canvasZoom = 20
 
-        # self.bind("<Configure>", self.resizeCanvas)
+        self.bind("<Configure>", self.resizeCanvas)
 
         self.drawCanvasFrame()
         self.createBlankCanvas()
         self.canvas.bind("<MouseWheel>", self.mouseWheel)
+        self.canvas.bind("<ButtonPress-1>", self.scroll_start)
+        self.canvas.bind("<B1-Motion>", self.scroll_move)
 
         self.canvasScrolling()
         self.canvasZoomButtons()
@@ -86,12 +88,17 @@ class Window(Frame):
 
         self.canvas.yview(SCROLL, scroll, UNITS)
 
-    def resizeCanvas(self, event):
-        self.windowWidth = event.width - 70
-        if abs(self.windowWidth - self.canvasWidth) > 20: ## re-draw the canvas if there are these many pixels of room
-            self.canvasZoom = round(self.windowWidth / self.gridSize[0])
+    def scroll_start(self, event):
+        self.canvas.scan_mark(event.x, event.y)
 
-            self.updateCanvasSize()
+    def scroll_move(self, event):
+        self.canvas.scan_dragto(event.x, event.y, gain=1)
+
+    def resizeCanvas(self, event):
+        self.canvasZoom = int(self.canvasFrame.winfo_height() / self.gridSize[1])
+        if self.canvasZoom == 0:
+            self.canvasZoom = 5# default startup zoom val
+        self.updateCanvasSize()
 
     def updateCanvasSize(self):
         self.canvasWidth = (self.canvasZoom * self.gridSize[0])
@@ -103,7 +110,7 @@ class Window(Frame):
         self.drawCanvasAxes()
         self.drawCanvasGrid()
 
-    def canvasScrolling(self):
+    def canvasScrolling(self): #TODO change scrolling to canvasZoom
         self.scroll_x = Scrollbar(self.canvasFrame, orient="horizontal", command=self.canvas.xview)
         self.scroll_x.grid(row=1, column=0, sticky=EW)
         self.scroll_y = Scrollbar(self.canvasFrame, orient="vertical", command=self.canvas.yview)
@@ -115,19 +122,33 @@ class Window(Frame):
     def canvasZoomButtons(self): #TODO "fill" frame button
         self.canvasZoomButtonFrame = Frame(self.canvasFrame)
         self.canvasZoomButtonFrame.grid(column=2, row=0, sticky=N)
+
         self.zoomInButton = Button(self.canvasZoomButtonFrame,text="+", width=3, font=BUTTON_FONT, command=self.zoomIn)
         self.zoomOutButton = Button(self.canvasZoomButtonFrame, text="-", width=3, font=BUTTON_FONT, command=self.zoomOut)
+        self.fillButton = Button(self.canvasZoomButtonFrame, text="Fill", width=3, font=BUTTON_FONT, command=self.fitCanvas)
+
         self.zoomInButton.pack()
         self.zoomOutButton.pack()
+        self.fillButton.pack()
 
-    def zoomIn(self):
+    def zoomIn(self): #TODO implement scaling vs redraw canvas
+        # self.canvas.addtag_all("resize")
+        # self.canvas.scale("resize", 0, 0, 1.1, 1.1)
         self.canvasZoom += 1
         self.updateCanvasSize()
 
-    def zoomOut(self): #TODO if canvas is already zoomed out, dont get smaller. Use widths to change sizes
-        self.canvasZoom -= 1
-        self.updateCanvasSize()
+    def zoomOut(self): #TODO implement scaling vs redraw canvas
+        # self.canvas.addtag_all("resize")
+        # self.canvas.scale("resize", 0, 0, .9, .9)
+        if self.canvasFrame.winfo_height() < self.canvasHeight:
+            self.canvasZoom -= 1
+            self.updateCanvasSize()
+        else:
+            self.fitCanvas()
 
+    def fitCanvas(self):
+        self.canvasZoom = (self.canvasFrame.winfo_height()-40) / self.gridSize[1]
+        self.updateCanvasSize()
 
     def drawCanvasGrid(self):
         fillColor = "#cccccc"
