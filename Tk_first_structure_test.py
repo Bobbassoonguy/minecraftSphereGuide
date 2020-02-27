@@ -42,7 +42,7 @@ class Window(Frame):
         self.canvasHeight = 0
         self.canvasZoom = 20
 
-        self.bind("<Configure>", self.resizeCanvas)
+        # self.bind("<Configure>", self.resizeCanvas)
 
         self.drawCanvasFrame()
         self.createBlankCanvas()
@@ -57,6 +57,13 @@ class Window(Frame):
 
 
     def createBlankCanvas(self):
+
+        self.canvasZoom = 12
+
+        self.canvasWidth = (self.canvasZoom * self.gridSize[0])
+        self.canvasHeight = (self.canvasZoom * self.gridSize[1])
+
+
         self.canvas = Canvas(self.canvasFrame, width=self.canvasWidth, height=self.canvasHeight, bg='white')
         self.canvas.grid(row=0, column=0)
 
@@ -66,7 +73,7 @@ class Window(Frame):
 
     def drawCanvasFrame(self):
         self.canvasFrame = Frame(self, bd=10, relief=SUNKEN,bg="blue")
-        self.canvasFrame.grid(row=2)
+        self.canvasFrame.grid(row=2,sticky=NSEW)
 
         # give priority to the size of canvasFrame in root grid
         self.rowconfigure(2, weight=1)
@@ -118,12 +125,8 @@ class Window(Frame):
         self.updateCanvasSize()
 
     def zoomOut(self): #TODO if canvas is already zoomed out, dont get smaller. Use widths to change sizes
-        print("App Width: " + str(self.winfo_width()))
-        print("CanvasFrame width - scrollbarWidth - buttonWidth: " + str(self.canvasFrame.winfo_width()-self.zoomInButton.winfo_width()-self.scroll_y.winfo_width()))
-        print("Canvas width: " + str(self.canvas.winfo_width()))
-        if abs(self.winfo_width() - self.canvasFrame.winfo_width()) > 10:
-            self.canvasZoom -= 1
-            self.updateCanvasSize()
+        self.canvasZoom -= 1
+        self.updateCanvasSize()
 
 
     def drawCanvasGrid(self):
@@ -168,6 +171,6 @@ root = Tk()
 
 
 app = Window(root)
-rootSize = str(800) + "x" + str(800)
+rootSize = str(600) + "x" + str(600)
 root.geometry(rootSize)
 root.mainloop()
