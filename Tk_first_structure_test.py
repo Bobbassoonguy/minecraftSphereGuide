@@ -24,7 +24,7 @@ class Window(Frame):
     #Creation of init_window
     def init_window(self):
         # changing the title
-        self.master.title("MINECRAFT SPHERE CALCULATOR")
+        self.master.title("Sphere Calculator")
 
         # allowing the widget to take the full space of the root window
         self.pack(fill=BOTH, expand=1)
@@ -137,6 +137,7 @@ class Window(Frame):
         self.canvasZoom += 1
         self.updateCanvasSize()
 
+    #TODO can't zoom out past maximum
     def zoomOut(self): #TODO implement scaling vs redraw canvas
         # self.canvas.addtag_all("resize")
         # self.canvas.scale("resize", 0, 0, .9, .9)
@@ -146,7 +147,7 @@ class Window(Frame):
         else:
             self.fitCanvas()
 
-    def fitCanvas(self):
+    def fitCanvas(self): #TODO make fit work better with scaling
         self.canvasZoom = (self.canvasFrame.winfo_height()-40) / self.gridSize[1]
         self.updateCanvasSize()
 
