@@ -195,4 +195,11 @@ root = Tk()
 app = Window(root)
 rootSize = str(600) + "x" + str(600)
 root.geometry(rootSize)
+
+#lifts window to top, but not permanently
+root.lift()
+root.attributes('-topmost',True)
+root.after_idle(root.attributes,'-topmost',False)
+
 root.mainloop()
+
