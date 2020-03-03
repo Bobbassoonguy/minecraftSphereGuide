@@ -1,5 +1,6 @@
 from tkinter import *
 import tk_canvasFrame_V2 as canvFrame
+import tk_parameterFrame as pFrame
 from Carson_Logic import circle
 import random
 
@@ -20,6 +21,7 @@ topLabel = Label(root, text=labelText, font=LABEL_FONT)
 topLabel.grid(row=0)
 
 canv = canvFrame.SquareDispCanvas(root)
+parameterFrame = pFrame.parameterFrame(root)
 
 radius = 10
 arrayOfCoords = circle(radius) # CARSON - put your array of coordinate pairs here
