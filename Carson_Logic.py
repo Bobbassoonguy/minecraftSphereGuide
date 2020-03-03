@@ -3,7 +3,7 @@ import random
 
 
 def f(x):
-    if(x == -1):
+    if x == -1:
         return 0
     return x
 
@@ -17,18 +17,26 @@ def circle(radius):
         dist = r2-z2
         x2 = dist
         x = math.sqrt(x2)
-        print((radius-0.5)**2)
-        print((radius+0.5)**2)
+        # print((radius-0.5)**2)
+        # print((radius+0.5)**2)
         for n in range(math.floor(x)-1, math.floor(x) + 2):
-            print(str(z) + ", " + str(n) + ", " + str(z**2+n**2))
+            # print(str(z) + ", " + str(n) + ", " + str(z**2+n**2))
             if z**2+n**2 > (radius-0.5)**2 and z2 + n**2 <= (radius+0.5)**2:
-                print("yes")
+                # print("yes")
                 for s in range(-1, 2, 2):
                     for t in range(-1, 2, 2):
                         array[n*s+math.floor(radius-f(s))][z*t+math.floor(radius-f(t))] = 1
                         array[z*t+math.floor(radius-f(t))][n*s+math.floor(radius-f(s))] = 1
-    for row in array:
-        print(row, "Penis")
+    for Row in array:
+        print(Row)
+    c = []
+    for a in range(2*radius):
+        for b in range(2*radius):
+            if array[a][b] == 1:
+                c.append([a, b])
+    return c
 
 
-circle(5)
+list1 = circle(10)
+for row in list1:
+    print(row)

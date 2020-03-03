@@ -1,6 +1,6 @@
 from tkinter import *
 import tk_canvasFrame_V2 as canvFrame
-import tk_parameterFrame as pFrame
+from Carson_Logic import circle
 import random
 
 LABEL_FONT = ("Times","30","bold")
@@ -20,9 +20,12 @@ topLabel = Label(root, text=labelText, font=LABEL_FONT)
 topLabel.grid(row=0)
 
 canv = canvFrame.SquareDispCanvas(root)
-parameterFrame = pFrame.parameterFrame(root)
 
-arrayOfCoords = [] # CARSON - put your array of coordinate pairs here
+radius = 10
+arrayOfCoords = circle(radius) # CARSON - put your array of coordinate pairs here
+for a in arrayOfCoords:
+    a[0] = a[0]-radius
+    a[1] = a[1]-radius
 
 canv.drawTheseRectangles(arrayOfCoords)
 
