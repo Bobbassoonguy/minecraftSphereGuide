@@ -9,7 +9,7 @@ class ResizingCanvas(Canvas):
         self.bind("<Configure>", self.on_resize)
         self.bind("<ButtonPress-1>", self.scroll_start)
         self.bind("<B1-Motion>", self.scroll_move)
-        # self.bind("<MouseWheel>", self.mouseWheel)
+        self.bind("<MouseWheel>", self.mouseWheel)
 
         self.height = self.winfo_reqheight()
         self.width = self.winfo_reqwidth()
@@ -72,7 +72,7 @@ class SquareDispCanvas:
     def __init__(self, master=None):
         self.master = master
 
-        self.gridSize = [99, 99]
+        self.gridSize = [50, 50]
 
         # Create display frame
         self.frame = Frame(self.master, bg="green")
@@ -91,6 +91,11 @@ class SquareDispCanvas:
 
         self.drawCanvasAxes()
         self.drawCanvasGrid()
+
+        self.drawRect([0,0])
+        self.drawRect([2, 2])
+        self.drawRect([5, 3])
+        self.drawRect([-5,2])
 
     def drawCanvasGrid(self):
         canvasHeight = self.canvas.height
@@ -182,6 +187,42 @@ class SquareDispCanvas:
         self.canvas.scale("all", 0, 0, scale, scale)
 
         print("fit:", self.canvas.width, ",", self.canvas.height, self.canvas.scrollregion)
+
+    def gridToCanvCoords(self, coords):
+        x = coords[0]
+        y = coords[1]
+        canvasHeight = self.canvas.height
+        canvasWidth = self.canvas.width
+        squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
+
+        x = x * squareSize[0]
+        y = y * squareSize[1]
+
+        if self.gridSize[0] % 2 == 0:
+            x = x + (canvasWidth/2)
+        else:
+            x = x + ((canvasWidth - squareSize[0]) / 2)
+
+        if self.gridSize[1] % 2 == 0:
+            y = ((canvasHeight/2)-squareSize[1]) - y
+        else:
+            y = ((canvasHeight - squareSize[1]) / 2) - y
+
+        return [x, y]
+
+    def drawRect(self, coords, small=True, color="red"):
+        canvasHeight = self.canvas.height
+        canvasWidth = self.canvas.width
+        squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
+
+        coords = self.gridToCanvCoords(coords)
+
+        border = 0
+        if small:
+            border = 15 # This is a percentage
+            border = squareSize[0] * (border/100)
+
+        self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0)
 
 
 root = Tk()
