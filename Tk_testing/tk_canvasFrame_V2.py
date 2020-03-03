@@ -5,24 +5,38 @@ from tkinter import *
 class ResizingCanvas(Canvas):
     def __init__(self, parent, **kwargs):
         Canvas.__init__(self, parent, **kwargs)
+
         self.bind("<Configure>", self.on_resize)
+        self.bind("<ButtonPress-1>", self.scroll_start)
+        self.bind("<B1-Motion>", self.scroll_move)
+
         self.height = self.winfo_reqheight()
         self.width = self.winfo_reqwidth()
+
+        self.scrollregion = (0, 0, self.width, self.height)
 
     def on_resize(self, event):
         # determine the ratio of old width/height to new width/height
         if event.width > event.height:
-            print("Window wide")
+            # print("Window wide")
+            scale = float(event.width) / self.width
+            self.width = event.width
+            self.height = self.width
         else:
-            print("Window tall")
-        wscale = float(event.width) / self.width
-        hscale = float(event.height) / self.height
-        self.width = event.width
-        self.height = event.height
-        # resize the canvas
-        self.config(width=self.width, height=self.height)
+            # print("Window tall")
+            scale = float(event.height) / self.height
+            self.height = event.height
+            self.width = self.height
+        # resize the canvas, update scrollregion
+        self.config(width=self.width, height=self.height, scrollregion=(0, 0, self.width, self.height))
         # rescale all the objects tagged with the "all" tag
-        self.scale("all", 0, 0, wscale, hscale)
+        self.scale("all", 0, 0, scale, scale)
+
+    def scroll_start(self, event):
+        self.scan_mark(event.x, event.y)
+
+    def scroll_move(self, event):
+        self.scan_dragto(event.x, event.y, gain=1)
 
 
 class SquareDispCanvas:
