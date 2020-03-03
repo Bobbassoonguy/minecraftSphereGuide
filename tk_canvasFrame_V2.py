@@ -76,7 +76,7 @@ class SquareDispCanvas:
 
         # Create display frame
         self.frame = Frame(self.master, bg="green")
-        self.frame.grid(row=2, sticky=NSEW)
+        self.frame.grid(row=2, sticky=NSEW) # TODO move this out of class
         master.rowconfigure(2, weight=1)  # TODO move this out of class
         master.columnconfigure(0, weight=1)  # TODO move this out of class
 
@@ -224,14 +224,3 @@ class SquareDispCanvas:
 
         self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0)
 
-
-root = Tk()
-
-disp = SquareDispCanvas(root)
-
-# lifts window to top, but not permanently
-root.lift()
-root.attributes('-topmost', True)
-root.after_idle(root.attributes, '-topmost', False)
-
-root.mainloop()
