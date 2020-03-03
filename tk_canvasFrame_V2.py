@@ -92,11 +92,6 @@ class SquareDispCanvas:
         self.drawCanvasAxes()
         self.drawCanvasGrid()
 
-        self.drawRect([0,0])
-        self.drawRect([2, 2])
-        self.drawRect([5, 3])
-        self.drawRect([-5,2])
-
     def drawCanvasGrid(self):
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
@@ -223,4 +218,8 @@ class SquareDispCanvas:
             border = squareSize[0] * (border/100)
 
         self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0)
+
+    def drawTheseRectangles(self, coords):
+        for pair in coords:
+            self.drawRect(pair)
 

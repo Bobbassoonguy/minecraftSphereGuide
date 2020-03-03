@@ -20,6 +20,9 @@ topLabel.grid(row=0)
 
 canv = canvFrame.SquareDispCanvas(root)
 
+arrayOfCoords = [[], [], []] # CARSON - put your array of coordinate pairs here
+
+canv.drawTheseRectangles(arrayOfCoords)
 
 
 
