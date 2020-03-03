@@ -28,7 +28,7 @@ def circle(radius):
                         array[n*s+math.floor(radius-f(s))][z*t+math.floor(radius-f(t))] = 1
                         array[z*t+math.floor(radius-f(t))][n*s+math.floor(radius-f(s))] = 1
     for row in array:
-        print(row)
+        print(row, "Penis")
 
 
 circle(5)
