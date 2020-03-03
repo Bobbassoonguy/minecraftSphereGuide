@@ -1,15 +1,21 @@
 from tkinter import *
 from tkinter import ttk
+import tk_canvasFrame
 
 #root application, can only have one of these.
 root = Tk()
 #put a label in the root to identify the window.
 label1 = Label(root, text="""this is root
 closing this window will shut down app""")
-label1.pack()
+label1.grid(row=0)
 
-button1 = Button(root, text="this is a button")
-button1.pack()
+canv = tk_canvasFrame.squareDispCanvas(root)
+
+def howBigIsFrame():
+    print(canv.frame.grid_bbox(column=0,row=0))
+
+button1 = Button(root, text="this is a button",command=howBigIsFrame)
+button1.grid(row=1)
 
 
 #you can make as many Toplevels as you like
