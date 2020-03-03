@@ -9,6 +9,7 @@ class ResizingCanvas(Canvas):
         self.bind("<Configure>", self.on_resize)
         self.bind("<ButtonPress-1>", self.scroll_start)
         self.bind("<B1-Motion>", self.scroll_move)
+        # self.bind("<MouseWheel>", self.mouseWheel)
 
         self.height = self.winfo_reqheight()
         self.width = self.winfo_reqwidth()
@@ -17,7 +18,8 @@ class ResizingCanvas(Canvas):
 
     def on_resize(self, event):
         # determine the ratio of old width/height to new width/height
-        if (round(event.width) != round(self.width) or round(event.height) != round(self.height)) and not self.supressResize:
+        if (round(event.width) != round(self.width) or round(event.height) != round(
+                self.height)) and not self.supressResize:
             if event.width > event.height:
                 # print("Window wide")
                 scale = float(event.width) / self.width
@@ -36,7 +38,7 @@ class ResizingCanvas(Canvas):
             print("resized:", self.width, ",", self.height, self.scrollregion)
         self.supressResize = False
 
-    def zoom(self, scale): # TODO figure out why before window is ever resized, zoom changes window size
+    def zoom(self, scale):  # TODO figure out why before window is ever resized, zoom changes window size
         self.supressResize = True
 
         # determine the ratio of old width/height to new width/height
@@ -55,6 +57,16 @@ class ResizingCanvas(Canvas):
     def scroll_move(self, event):
         self.scan_dragto(event.x, event.y, gain=1)
 
+    def mouseWheel(self, event):
+        scroll = event.delta
+        if abs(scroll) > 100:
+            scroll = -1 * int(scroll / 120)
+
+        if (scroll > 0):
+            self.zoom(1.05)
+        elif (scroll < 0):
+            self.zoom(.95)
+
 
 class SquareDispCanvas:
     def __init__(self, master=None):
@@ -63,13 +75,13 @@ class SquareDispCanvas:
         self.gridSize = [99, 99]
 
         # Create display frame
-        self.frame = Frame(self.master,bg="green")
+        self.frame = Frame(self.master, bg="green")
         self.frame.grid(row=2, sticky=NSEW)
         master.rowconfigure(2, weight=1)  # TODO move this out of class
         master.columnconfigure(0, weight=1)  # TODO move this out of class
 
         # Create resizing canvas
-        self.canvas = ResizingCanvas(self.frame, width=700, height=700, bg="red", highlightthickness=0)
+        self.canvas = ResizingCanvas(self.frame, width=700, height=700, bg="white", highlightthickness=0)
         self.canvas.grid(row=0, column=0, sticky=NSEW)
         self.frame.columnconfigure(0, weight=1)
         self.frame.rowconfigure(0, weight=1)
@@ -77,13 +89,13 @@ class SquareDispCanvas:
         self.canvasScrolling()
         self.canvasZoomButtons()
 
-        self.drawCanvasGrid()
         self.drawCanvasAxes()
+        self.drawCanvasGrid()
 
     def drawCanvasGrid(self):
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
-        squareSize = [canvasWidth/self.gridSize[0], canvasHeight/self.gridSize[1]]
+        squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
 
         fillColor = "#cccccc"
         for x in range(0, self.gridSize[0] + 1):
@@ -97,7 +109,7 @@ class SquareDispCanvas:
     def drawCanvasAxes(self):
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
-        squareSize = [canvasWidth/self.gridSize[0], canvasHeight/self.gridSize[1]]
+        squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
         if self.gridSize[0] % 2 == 0:
             yAxis = self.canvas.create_line(canvasWidth / 2, 0, canvasWidth / 2, canvasHeight, width=1,
                                             fill="#00cc00")
@@ -136,7 +148,7 @@ class SquareDispCanvas:
 
         self.zoomInButton = Button(self.canvasZoomButtonFrame, text="+", width=3, command=self.zoomIn)
         self.zoomOutButton = Button(self.canvasZoomButtonFrame, text="-", width=3, command=self.zoomOut)
-        self.fillButton = Button(self.canvasZoomButtonFrame, text="Fill", width=3)
+        self.fillButton = Button(self.canvasZoomButtonFrame, text="Fill", width=3, command=self.fit)
 
         self.zoomInButton.pack()
         self.zoomOutButton.pack()
@@ -150,11 +162,26 @@ class SquareDispCanvas:
         self.canvas.zoom(.9)
 
     def fit(self):
+        canvYRoom = self.frame.grid_bbox(0, 0)[3]
+        canvXRoom = self.frame.grid_bbox(0, 0)[2]
+        # determine the ratio of old width/height to new width/height
+        if canvXRoom > canvYRoom:
+            # print("Window wide")
+            scale = float(canvYRoom) / self.canvas.height
+            self.canvas.height = canvYRoom
+            self.canvas.width = self.canvas.height
+        else:
+            # print("Window tall")
+            scale = float(canvXRoom) / self.canvas.width
+            self.canvas.width = canvXRoom
+            self.canvas.height = self.canvas.width
+        # resize the canvas, update scrollregion
+        self.canvas.config(width=self.canvas.width, height=self.canvas.height,
+                           scrollregion=(0, 0, self.canvas.width, self.canvas.height))
+        # rescale all the objects tagged with the "all" tag
+        self.canvas.scale("all", 0, 0, scale, scale)
 
-
-
-
-
+        print("fit:", self.canvas.width, ",", self.canvas.height, self.canvas.scrollregion)
 
 
 root = Tk()
