@@ -27,8 +27,8 @@ def circle(radius):
                     for t in range(-1, 2, 2):
                         array[n*s+math.floor(radius-f(s))][z*t+math.floor(radius-f(t))] = 1
                         array[z*t+math.floor(radius-f(t))][n*s+math.floor(radius-f(s))] = 1
-    for Row in array:
-        print(Row)
+    # for Row in array:
+        # print(Row)
     c = []
     for a in range(2*radius):
         for b in range(2*radius):

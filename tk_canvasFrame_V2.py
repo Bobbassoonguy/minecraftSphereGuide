@@ -72,7 +72,7 @@ class SquareDispCanvas:
     def __init__(self, master=None):
         self.master = master
 
-        self.gridSize = [50, 50]
+        self.gridSize = [200, 200]
 
         # Create display frame
         self.frame = Frame(self.master, bg="green")
@@ -219,7 +219,7 @@ class SquareDispCanvas:
 
         self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0)
 
-    def drawTheseRectangles(self, coords):
+    def drawTheseRectangles(self, coords,color="red"):
         for pair in coords:
-            self.drawRect(pair)
+            self.drawRect(pair,small=False,color=color)
 
