@@ -2,6 +2,7 @@ from tkinter import *
 import tk_canvasFrame_V2 as canvFrame
 import tk_parameterFrame as pFrame
 from Carson_Logic import circle
+from Carson_Logic import sphere
 import random
 import colorsys
 
@@ -28,7 +29,7 @@ topLabel.grid(row=0)
 
 canv = canvFrame.SquareDispCanvas(root)
 
-maxRad = 50
+maxRad = 10
 
 for hue in range(0,100,int(100/maxRad)):
     (r, g, b) = colorsys.hsv_to_rgb(hue/100, 1.0, 1.0)
