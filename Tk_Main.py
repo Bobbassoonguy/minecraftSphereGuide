@@ -29,9 +29,9 @@ topLabel.grid(row=0)
 
 canv = canvFrame.SquareDispCanvas(root)
 
-radius = 128
-for hue in range(0,1000,int(1000/(2.0*radius))):
-    (r, g, b) = colorsys.hsv_to_rgb(hue/10, 1.0, 1.0)
+radius = 20
+for hue in range(0,1000,int(1000/(radius))):
+    (r, g, b) = colorsys.hsv_to_rgb(hue/1000, 1.0, 1.0)
     R, G, B = int(255 * r), int(255 * g), int(255 * b)
     rainbowList.append(RGB(R,G,B))
 
@@ -53,7 +53,11 @@ for layer in range(0,len(array)):
         temp = a[0]
         a[0] = a[2]
         a[2] = temp
+for layer in range(len(array)-1, -1, -1):
+    if array[layer][0][2] < 0:
+        array.pop(layer)
 
+for layer in range(0, len(array)):
     canv.drawTheseRectangles(array[layer],color=rainbowList[layer])
 
 canv.drawCanvasGrid()
