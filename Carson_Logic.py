@@ -64,17 +64,17 @@ def sphere(radius):
                                 array[z * t + math.floor(radius - f(t))][y * u + math.floor(radius - f(u))][n * s + math.floor(radius - f(s))] = 1
                                 array[n * s + math.floor(radius - f(s))][z * t + math.floor(radius - f(t))][y * u + math.floor(radius - f(u))] = 1
                                 array[z * t + math.floor(radius - f(t))][n * s + math.floor(radius - f(s))][y * u + math.floor(radius - f(u))] = 1
-    #for Row in array:
-        #print(Row)
+    # for Row in array:
+        # print(Row)
     c = []
     for a in range(2 * radius):
         for b in range(2 * radius):
             for d in range(2 * radius):
                 if array[a][b][d] == 1:
-                    c.append([a, b])
+                    c.append([a, b, d])
     return c
 
 
 list1 = sphere(10)
-for row in list1:
-    print(row)
+# for row in list1:
+    # print(row)

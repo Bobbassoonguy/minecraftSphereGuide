@@ -29,20 +29,32 @@ topLabel.grid(row=0)
 
 canv = canvFrame.SquareDispCanvas(root)
 
-maxRad = 10
-
-for hue in range(0,100,int(100/maxRad)):
-    (r, g, b) = colorsys.hsv_to_rgb(hue/100, 1.0, 1.0)
+radius = 128
+for hue in range(0,1000,int(1000/(2.0*radius))):
+    (r, g, b) = colorsys.hsv_to_rgb(hue/10, 1.0, 1.0)
     R, G, B = int(255 * r), int(255 * g), int(255 * b)
     rainbowList.append(RGB(R,G,B))
 
-for radius in range(1,maxRad):
-    arrayOfCoords = circle(radius) # CARSON - put your array of coordinate pairs here
-    for a in arrayOfCoords:
-        a[0] = a[0]-radius
-        a[1] = a[1]-radius
+arrayOfCoords = sphere(radius)
+array = [[]]
+canv.gridSize = [2*radius,2*radius]
+for triplet in arrayOfCoords:
+    if triplet[0] == len(array):
+        array.append([])
+    array[len(array)-1].append(triplet)
+for layer in range(0,len(array)):
+    # arrayOfCoords = circle(radius) # CARSON - put your array of coordinate pairs here
+    # arrayOfCoords = sphere(radius)
+    for a in array[layer]:
+        # print(arrayOfCoords[layer])
+        a[0] = a[0] - radius
+        a[1] = a[1] - radius
+        a[2] = a[2] - radius
+        temp = a[0]
+        a[0] = a[2]
+        a[2] = temp
 
-    canv.drawTheseRectangles(arrayOfCoords,color=rainbowList[radius])
+    canv.drawTheseRectangles(array[layer],color=rainbowList[layer])
 
 canv.drawCanvasGrid()
 
