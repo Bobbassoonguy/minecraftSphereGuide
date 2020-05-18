@@ -3,6 +3,7 @@ import tk_canvasFrame_V2 as canvFrame
 import tk_parameterFrame as pFrame
 from Carson_Logic import circle
 from Carson_Logic import sphereFormatted
+import math
 import random
 
 
@@ -91,6 +92,10 @@ class parameterFrame:
                 self.layerEntry.delete(0, len(self.layerEntry.get()))
                 self.layerEntry.insert(0, str(int(currentLayer)-1))
                 dispLayer()
+            elif currentLayer == 1:
+                self.layerEntry.delete(0, len(self.layerEntry.get()))
+                self.layerEntry.insert(0, str(-1))
+
 
 
 
@@ -114,10 +119,12 @@ def updateRad():
         canv.updateRadius(radius)
         dispLayer()
 
+
 def dispLayer():
     newLayer = pFrame.getL()
     if newLayer is not None:
         newLayer -= 1
+        newLayer = abs(newLayer)
         print("Layer Updated")
         canv.removeRectangles()
         canv.drawTheseRectangles(sphere[newLayer])
