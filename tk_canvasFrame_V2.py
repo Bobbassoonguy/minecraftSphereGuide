@@ -1,4 +1,16 @@
 from tkinter import *
+import colorsys
+from Carson_Logic import sphereFormatted
+
+def RGB(red,green,blue): return '#%02x%02x%02x' % (red,green,blue)
+
+def drawRainbow(rad):
+    rainbowList = []
+    for hue in range(0, 1000, int(1000 / rad)):
+        (r, g, b) = colorsys.hsv_to_rgb(hue / 1000, 1.0, 1.0)
+        R, G, B = int(255 * r), int(255 * g), int(255 * b)
+        rainbowList.append(RGB(R, G, B))
+    return rainbowList
 
 
 # a subclass of Canvas for dealing with resizing of windows
@@ -67,12 +79,17 @@ class ResizingCanvas(Canvas):
         elif (scroll < 0):
             self.zoom(.95)
 
+    def clearAll(self):
+        self.addtag_all("all")
+        self.delete("all")
+
 
 class SquareDispCanvas:
-    def __init__(self, master=None):
+    def __init__(self, master=None, radius=16, pFrame=None):
         self.master = master
+        self.pFrame = pFrame
 
-        self.gridSize = [200, 200]
+        self.gridSize = [radius, radius]
 
         # Create display frame
         self.frame = Frame(self.master, bg="green")
@@ -81,7 +98,7 @@ class SquareDispCanvas:
         master.columnconfigure(0, weight=1)  # TODO move this out of class
 
         # Create resizing canvas
-        self.canvas = ResizingCanvas(self.frame, width=700, height=700, bg="white", highlightthickness=0)
+        self.canvas = ResizingCanvas(self.frame, width=radius*10, height=radius*10, bg="white", highlightthickness=0)
         self.canvas.grid(row=0, column=0, sticky=NSEW)
         self.frame.columnconfigure(0, weight=1)
         self.frame.rowconfigure(0, weight=1)
@@ -89,8 +106,6 @@ class SquareDispCanvas:
         self.canvasScrolling()
         self.canvasZoomButtons()
 
-        self.drawCanvasAxes()
-        self.drawCanvasGrid()
 
     def drawCanvasGrid(self):
         canvasHeight = self.canvas.height
@@ -99,40 +114,32 @@ class SquareDispCanvas:
 
         fillColor = "#cccccc"
         for x in range(0, self.gridSize[0] + 1):
-            if x != self.gridSize[0] / 2:
-                self.canvas.create_line(x * squareSize[0], 0, x * squareSize[0], canvasHeight, width=1, fill=fillColor)
+            self.canvas.create_line(x * squareSize[0], 0, x * squareSize[0], canvasHeight, width=1, fill=fillColor)
         for y in range(0, self.gridSize[1] + 1):
-            if y != self.gridSize[1] / 2:
-                self.canvas.create_line(0, y * squareSize[1], canvasWidth, y * squareSize[1], width=1, fill=fillColor)
-        self.canvas.create_rectangle(0, 0, canvasHeight, canvasWidth, outline='Orange', width=2)
+            self.canvas.create_line(0, y * squareSize[1], canvasWidth, y * squareSize[1], width=1, fill=fillColor)
+        # self.canvas.create_rectangle(0, 0, canvasHeight, canvasWidth, outline='Orange', width=1)
 
     def drawCanvasAxes(self):
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
-        if self.gridSize[0] % 2 == 0:
-            yAxis = self.canvas.create_line(canvasWidth / 2, 0, canvasWidth / 2, canvasHeight, width=1,
+        if type(self.gridSize[0]) is int:
+            print("X is int")
+            yAxis = self.canvas.create_line(0, 0, 0, canvasHeight, width=4,
                                             fill="#00cc00")
         else:
-            yAxis = self.canvas.create_rectangle((canvasWidth / 2) - (squareSize[0] / 2), 0,
-                                                 (canvasWidth / 2) + (squareSize[0] / 2),
-                                                 canvasHeight,
-                                                 fill="#e6ffe6", width=0)
-        if self.gridSize[1] % 2 == 0:
-            xAxis = self.canvas.create_line(0, canvasHeight / 2, canvasWidth, canvasHeight / 2, width=1,
-                                            fill="red")
+            yAxis = self.canvas.create_rectangle(0, 0, squareSize[0], canvasHeight, fill="#e6ffe6", width=0)
+        if type(self.gridSize[1]) is int:
+            xAxis = self.canvas.create_line(0, canvasHeight, canvasWidth, canvasHeight, width=4, fill="red")
         else:
-            xAxis = self.canvas.create_rectangle(0, (canvasHeight / 2) - (squareSize[1] / 2),
-                                                 canvasWidth,
-                                                 (canvasHeight / 2) + (squareSize[1] / 2), fill="#ffe6e6",
-                                                 width=0)
+            xAxis = self.canvas.create_rectangle(0, canvasHeight - squareSize[1], canvasWidth, canvasHeight, fill="#ffe6e6", width=0)
 
-        if self.gridSize[0] % 2 != 0 and self.gridSize[1] % 2 != 0:
-            origin = self.canvas.create_rectangle((canvasWidth / 2) - (squareSize[0] / 2),
-                                                  (canvasHeight / 2) - (squareSize[1] / 2),
-                                                  (canvasWidth / 2) + (squareSize[0] / 2),
-                                                  (canvasHeight / 2) + (squareSize[1] / 2), fill="#cce0ff",
-                                                  width=0)
+        # if self.gridSize[0] % 2 != 0 and self.gridSize[1] % 2 != 0:
+        #     origin = self.canvas.create_rectangle((canvasWidth / 2) - (squareSize[0] / 2),
+        #                                           (canvasHeight / 2) - (squareSize[1] / 2),
+        #                                           (canvasWidth / 2) + (squareSize[0] / 2),
+        #                                           (canvasHeight / 2) + (squareSize[1] / 2), fill="#cce0ff",
+        #                                           width=0)
 
     def canvasScrolling(self):  # TODO change scrolling to canvasZoom
         self.scroll_x = Scrollbar(self.frame, orient="horizontal", command=self.canvas.xview)
@@ -191,17 +198,7 @@ class SquareDispCanvas:
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
 
         x = x * squareSize[0]
-        y = y * squareSize[1]
-
-        if self.gridSize[0] % 2 == 0:
-            x = x + (canvasWidth/2)
-        else:
-            x = x + ((canvasWidth - squareSize[0]) / 2)
-
-        if self.gridSize[1] % 2 == 0:
-            y = ((canvasHeight/2)-squareSize[1]) - y
-        else:
-            y = ((canvasHeight - squareSize[1]) / 2) - y
+        y = self.canvas.height - (y * squareSize[1])
 
         return [x, y]
 
@@ -212,14 +209,27 @@ class SquareDispCanvas:
 
         coords = self.gridToCanvCoords(coords)
 
-        border = 0
+        border = .5
         if small:
-            border = 15 # This is a percentage
-            border = squareSize[0] * (border/100)
+            border = 3
 
-        self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0)
+        self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0,tags="rectangle")
 
     def drawTheseRectangles(self, coords,color="red"):
         for pair in coords:
             self.drawRect(pair,small=False,color=color)
 
+    def updateRadius(self, newRad):
+        if type(int(newRad)) is int:
+            newRad = int(newRad)
+            self.gridSize = [newRad, newRad]
+            self.canvas.clearAll()
+            self.canvas.config(width=newRad*10, height=newRad*10)
+
+            # self.drawThisSphere(newRad)
+
+            self.drawCanvasGrid()
+            self.drawCanvasAxes()
+
+    def removeRectangles(self):
+        self.canvas.delete("rectangle")
