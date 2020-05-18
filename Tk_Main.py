@@ -80,10 +80,10 @@ class parameterFrame:
         self.adjacentLayerFrame = Frame(self.frame, relief=RIDGE, bd=4)
         self.adjacentLayerFrame.grid(column=3, row=0, sticky=N)  # TODO move this out of class
 
-        self.aboveCheck = Checkbutton(self.adjacentLayerFrame, text="View Layer Above", command=toggleAbove, font=BUTTON_FONT)
+        self.aboveCheck = Checkbutton(self.adjacentLayerFrame, text="View Layer Above", command=toggleAbove, font=BUTTON_FONT, fg="blue")
         self.aboveCheck.grid(row=1, column=0, sticky=EW)
 
-        self.belowCheck = Checkbutton(self.adjacentLayerFrame, text="View Layer Below", command=toggleBelow, font=BUTTON_FONT)
+        self.belowCheck = Checkbutton(self.adjacentLayerFrame, text="View Layer Below", command=toggleBelow, font=BUTTON_FONT,fg="green")
         self.belowCheck.grid(row=2, column=0, sticky=EW)
 
     def getR(self):
