@@ -24,6 +24,7 @@ class parameterFrame:
         self.rframe()
         self.lframe()
         self.rotFrame()
+        self.adjFrame()
 
     def linkToCanvas(self, canv):
         self.canvFrame = canv
@@ -75,6 +76,16 @@ class parameterFrame:
         self.CWButton = Button(self.rotateFrame, text=" ↷ ", command=rotateCW, font=BUTTON_FONT)
         self.CWButton.grid(row=1, column=1, sticky=EW)
 
+    def adjFrame(self):
+        self.adjacentLayerFrame = Frame(self.frame, relief=RIDGE, bd=4)
+        self.adjacentLayerFrame.grid(column=2, row=0, sticky=N)  # TODO move this out of class
+
+        self.aboveCheck = Checkbutton(self.adjacentLayerFrame, text="View Layer Above", command=toggleAbove, font=BUTTON_FONT)
+        self.aboveCheck.grid(row=1, column=0, sticky=EW)
+
+        self.belowCheck = Checkbutton(self.adjacentLayerFrame, text="View Layer Below", command=toggleBelow, font=BUTTON_FONT)
+        self.belowCheck.grid(row=2, column=0, sticky=EW)
+
     def getR(self):
         rad = int(self.radiusEntry.get())
         if type(rad) is not int and type(rad) is not float:
@@ -125,6 +136,10 @@ class parameterFrame:
 
 
 
+aboveDisp = False
+belowDisp = False
+
+
 
 def createTitle():
     labelText = "Sphere Calculator"
@@ -153,16 +168,18 @@ def dispLayer():
             newLayer = 1
         print("Layer Updated")
         canv.removeRectangles()
-        if newLayer != -1*radius:
+
+        if newLayer != -1*radius and belowDisp:
             layer2 = newLayer-1-(int)(newLayer/abs(newLayer))
             layer2 = abs(layer2)
             canv.drawTheseRectangles(sphere[layer2], "green")
-        if newLayer != radius:
+        if newLayer != radius and aboveDisp:
             layer3 = newLayer+1-(int)(newLayer/abs(newLayer))
             layer3 = abs(layer3)
             canv.drawTheseRectangles(sphere[layer3], "blue")
         newLayer -= (int)(newLayer/abs(newLayer))
         newLayer = abs(newLayer)
+
         canv.drawTheseRectangles(sphere[newLayer])
 
 def rotateCW():
@@ -195,6 +212,24 @@ def rotateCCW():
     updateRad()
     dispLayer()
 
+def toggleAbove():
+    global aboveDisp
+    if aboveDisp:
+        aboveDisp = False
+    else:
+        aboveDisp = True
+
+    dispLayer()
+
+def toggleBelow():
+    global belowDisp
+    if belowDisp:
+        belowDisp = False
+    else:
+        belowDisp = True
+
+    dispLayer()
+
 #root application, can only have one of these.
 root = Tk()
 root.title("Sphere Calculator")
@@ -203,6 +238,8 @@ createTitle()
 
 radius = 32
 Layer = 1
+
+
 
 pFrame = parameterFrame(defaultR=radius)
 canv = canvFrame.SquareDispCanvas(root, radius)
