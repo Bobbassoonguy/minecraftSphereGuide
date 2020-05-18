@@ -174,11 +174,11 @@ def dispLayer():
         if newLayer != -1*radius and belowDisp:
             layer2 = newLayer-1
             layer2 = abs(layer2)
-            canv.drawTheseRectangles(sphere[layer2], "green")
+            canv.drawTheseRectangles(sphere[layer2], "green",stippled="ALWAYS")
         if newLayer != radius and aboveDisp:
             layer3 = newLayer+1
             layer3 = abs(layer3)
-            canv.drawTheseRectangles(sphere[layer3], "blue")
+            canv.drawTheseRectangles(sphere[layer3], "blue",stippled="ALWAYS")
 
 def rotateCW():
     print("Rotated CW")

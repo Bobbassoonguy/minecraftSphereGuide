@@ -234,7 +234,7 @@ class SquareDispCanvas:
 
         return [x, y]
 
-    def drawRect(self, coords, small=True, color="red"):
+    def drawRect(self, coords, small=True, color="red", stippled="ACTIVE"):
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
@@ -245,25 +245,32 @@ class SquareDispCanvas:
         if small:
             border = 3
 
-        self.canvas.create_rectangle(CanvCoords[0] + border, CanvCoords[1] + border, (CanvCoords[0] + squareSize[0]) - border,
+        if stippled == "ACTIVE":
+            self.canvas.create_rectangle(CanvCoords[0] + border, CanvCoords[1] + border, (CanvCoords[0] + squareSize[0]) - border,
                                      (CanvCoords[1] + squareSize[1]) - border, fill=color, width=0, tags=("rectangle",("x"+str(coords[0])), ("y"+str(coords[1]))),
                                      activestipple="gray75")
+        elif stippled == "ALWAYS":
+            self.canvas.create_rectangle(CanvCoords[0] + border, CanvCoords[1] + border,
+                                         (CanvCoords[0] + squareSize[0]) - border,
+                                         (CanvCoords[1] + squareSize[1]) - border, fill=color, width=0,
+                                         tags=("rectangle", ("x" + str(coords[0])), ("y" + str(coords[1]))),
+                                         stipple="gray50")
 
-    def drawTheseRectangles(self, coords, color="red"):
+    def drawTheseRectangles(self, coords, color="red", stippled="ACTIVE"):
 
         for pair in coords:
             if self.originLoc == "SW":
                 if pair[0] >= 0 and pair[1] >= 0:
-                    self.drawRect(pair, small=False, color=color)
+                    self.drawRect(pair, small=False, color=color, stippled=stippled)
             elif self.originLoc == "SE":
                 if pair[0] <= 0 and pair[1] >= 0:
-                    self.drawRect(pair, small=False, color=color)
+                    self.drawRect(pair, small=False, color=color, stippled=stippled)
             elif self.originLoc == "NW":
                 if pair[0] >= 0 and pair[1] <= 0:
-                    self.drawRect(pair, small=False, color=color)
+                    self.drawRect(pair, small=False, color=color, stippled=stippled)
             elif self.originLoc == "NE":
                 if pair[0] <= 0 and pair[1] <= 0:
-                    self.drawRect(pair, small=False, color=color)
+                    self.drawRect(pair, small=False, color=color, stippled=stippled)
 
     def updateRadius(self, newRad):
         if type(int(newRad)) is int:
