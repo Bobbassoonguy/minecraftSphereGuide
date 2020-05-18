@@ -79,7 +79,15 @@ class parameterFrame:
         currentLayer = self.getL()
         currentRadius = self.getR()
         if currentLayer is not None and currentRadius is not None:
-            if currentLayer < currentRadius:
+            if currentLayer < -1:
+                self.layerEntry.delete(0, len(self.layerEntry.get()))
+                self.layerEntry.insert(0, str(1+int(currentLayer)))
+                dispLayer()
+            elif currentLayer == -1:
+                self.layerEntry.delete(0, len(self.layerEntry.get()))
+                self.layerEntry.insert(0, str(1))
+                dispLayer()
+            elif currentLayer < currentRadius:
                 self.layerEntry.delete(0, len(self.layerEntry.get()))
                 self.layerEntry.insert(0, str(1+int(currentLayer)))
                 dispLayer()
@@ -95,6 +103,11 @@ class parameterFrame:
             elif currentLayer == 1:
                 self.layerEntry.delete(0, len(self.layerEntry.get()))
                 self.layerEntry.insert(0, str(-1))
+                dispLayer()
+            elif currentLayer > -1*radius:
+                self.layerEntry.delete(0, len(self.layerEntry.get()))
+                self.layerEntry.insert(0, str(int(currentLayer-1)))
+                dispLayer()
 
 
 
@@ -123,7 +136,9 @@ def updateRad():
 def dispLayer():
     newLayer = pFrame.getL()
     if newLayer is not None:
-        newLayer -= 1
+        if newLayer == 0:
+            newLayer = 1
+        newLayer -= (int)(newLayer/abs(newLayer))
         newLayer = abs(newLayer)
         print("Layer Updated")
         canv.removeRectangles()
