@@ -9,7 +9,7 @@ import random
 
 LABEL_FONT = ("Times","30","bold")
 SUBLABEL_FONT = ("Times","12")
-BUTTON_FONT = ("Times","15")
+BUTTON_FONT = ("Times","10")
 
 
 class parameterFrame:
@@ -23,6 +23,7 @@ class parameterFrame:
 
         self.rframe()
         self.lframe()
+        self.rotFrame()
 
     def linkToCanvas(self, canv):
         self.canvFrame = canv
@@ -60,6 +61,19 @@ class parameterFrame:
 
         self.layerUpdateButton = Button(self.layerFrame, text="Update", command=dispLayer)
         self.layerUpdateButton.grid(row=1, column=1, columnspan=2, sticky=W)
+
+    def rotFrame(self):
+        self.rotateFrame = Frame(self.frame, relief=RIDGE, bd=4)
+        self.rotateFrame.grid(column=2, row=0, sticky=N)  # TODO move this out of class
+
+        rotLabel = Label(self.rotateFrame, text="Rotate Display", font=SUBLABEL_FONT)
+        rotLabel.grid(row=0, sticky=W, columnspan=2)
+
+        self.CCWButton = Button(self.rotateFrame, text=" ↶ ", command=rotateCCW, font=BUTTON_FONT)
+        self.CCWButton.grid(row=1, column=0, sticky=EW)
+
+        self.CWButton = Button(self.rotateFrame, text=" ↷ ", command=rotateCW, font=BUTTON_FONT)
+        self.CWButton.grid(row=1, column=1, sticky=EW)
 
     def getR(self):
         rad = int(self.radiusEntry.get())
@@ -112,7 +126,6 @@ class parameterFrame:
 
 
 
-
 def createTitle():
     labelText = "Sphere Calculator"
     if random.randint(0, 200) == 0:
@@ -132,7 +145,6 @@ def updateRad():
         canv.updateRadius(radius)
         dispLayer()
 
-
 def dispLayer():
     newLayer = pFrame.getL()
     if newLayer is not None:
@@ -144,6 +156,35 @@ def dispLayer():
         canv.removeRectangles()
         canv.drawTheseRectangles(sphere[newLayer])
 
+def rotateCW():
+    print("Rotated CW")
+    origin = canv.originLoc
+    if origin == "SW":
+        canv.originLoc = "NW"
+    elif origin == "NW":
+        canv.originLoc = "NE"
+    elif origin == "NE":
+        canv.originLoc = "SE"
+    elif origin == "SE":
+        canv.originLoc = "SW"
+
+    updateRad()
+    dispLayer()
+
+def rotateCCW():
+    print("Rotated CCW")
+    origin = canv.originLoc
+    if origin == "NW":
+        canv.originLoc = "SW"
+    elif origin == "NE":
+        canv.originLoc = "NW"
+    elif origin == "SE":
+        canv.originLoc = "NE"
+    elif origin == "SW":
+        canv.originLoc = "SE"
+
+    updateRad()
+    dispLayer()
 
 #root application, can only have one of these.
 root = Tk()

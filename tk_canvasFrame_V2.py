@@ -90,6 +90,7 @@ class SquareDispCanvas:
         self.pFrame = pFrame
 
         self.gridSize = [radius, radius]
+        self.originLoc = "SW"
 
         # Create display frame
         self.frame = Frame(self.master, relief=SUNKEN, bd=4)
@@ -123,16 +124,32 @@ class SquareDispCanvas:
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
-        if type(self.gridSize[0]) is int:
-            print("X is int")
-            yAxis = self.canvas.create_line(0, 0, 0, canvasHeight, width=4,
+        axisWidth = 6
+
+        if self.originLoc == "SW":
+            yAxis = self.canvas.create_line(0, 0, 0, canvasHeight, width=axisWidth,
                                             fill="#00cc00")
-        else:
-            yAxis = self.canvas.create_rectangle(0, 0, squareSize[0], canvasHeight, fill="#e6ffe6", width=0)
-        if type(self.gridSize[1]) is int:
-            xAxis = self.canvas.create_line(0, canvasHeight, canvasWidth, canvasHeight, width=4, fill="red")
-        else:
-            xAxis = self.canvas.create_rectangle(0, canvasHeight - squareSize[1], canvasWidth, canvasHeight, fill="#ffe6e6", width=0)
+            xAxis = self.canvas.create_line(0, canvasHeight, canvasWidth, canvasHeight, width=axisWidth, fill="red")
+        elif self.originLoc == "SE":
+            yAxis = self.canvas.create_line(canvasWidth, 0, canvasWidth, canvasHeight, width=axisWidth,
+                                            fill="#00cc00")
+        elif self.originLoc == "NW":
+            xAxis = self.canvas.create_line(0, 0, canvasWidth, 0, width=axisWidth, fill="red")
+        elif self.originLoc == "NE":
+            print("No Axes")
+
+
+        # if type(self.gridSize[0]) is int:
+        #     print("X is int")
+        #     yAxis = self.canvas.create_line(0, 0, 0, canvasHeight, width=4,
+        #                                     fill="#00cc00")
+        # else:
+        #     yAxis = self.canvas.create_rectangle(0, 0, squareSize[0], canvasHeight, fill="#e6ffe6", width=0)
+        # if type(self.gridSize[1]) is int:
+        #     xAxis = self.canvas.create_line(0, canvasHeight, canvasWidth, canvasHeight, width=4, fill="red")
+        # else:
+        #     xAxis = self.canvas.create_rectangle(0, canvasHeight - squareSize[1], canvasWidth, canvasHeight,
+        #                                          fill="#ffe6e6", width=0)
 
         # if self.gridSize[0] % 2 != 0 and self.gridSize[1] % 2 != 0:
         #     origin = self.canvas.create_rectangle((canvasWidth / 2) - (squareSize[0] / 2),
@@ -193,12 +210,23 @@ class SquareDispCanvas:
     def gridToCanvCoords(self, coords):
         x = coords[0]
         y = coords[1]
+
         canvasHeight = self.canvas.height
         canvasWidth = self.canvas.width
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
 
-        x = x * squareSize[0]
-        y = self.canvas.height - ((y+1) * squareSize[1])
+        if self.originLoc == "SW":
+            x = x * squareSize[0]
+            y = self.canvas.height - ((y + 1) * squareSize[1])
+        elif self.originLoc == "SE":
+            x = canvasWidth + (x * squareSize[0])
+            y = self.canvas.height - ((y + 1) * squareSize[1])
+        elif self.originLoc == "NW":
+            x = x * squareSize[0]
+            y = ((-1 * (y+1)) * squareSize[1])
+        elif self.originLoc == "NE":
+            x = canvasWidth + (x * squareSize[0])
+            y = ((-1 * (y+1)) * squareSize[1])
 
         return [x, y]
 
@@ -216,9 +244,21 @@ class SquareDispCanvas:
         self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0,tags="rectangle")
 
     def drawTheseRectangles(self, coords,color="red"):
+
         for pair in coords:
-            if pair[0] >= 0 and pair[1] >= 0:
-                self.drawRect(pair,small=False,color=color)
+            if self.originLoc == "SW":
+                if pair[0] >= 0 and pair[1] >= 0:
+                    self.drawRect(pair, small=False, color=color)
+            elif self.originLoc == "SE":
+                if pair[0] <= 0 and pair[1] >= 0:
+                    self.drawRect(pair, small=False, color=color)
+            elif self.originLoc == "NW":
+                if pair[0] >= 0 and pair[1] <= 0:
+                    self.drawRect(pair, small=False, color=color)
+            elif self.originLoc == "NE":
+                if pair[0] <= 0 and pair[1] <= 0:
+                    self.drawRect(pair, small=False, color=color)
+
 
     def updateRadius(self, newRad):
         if type(int(newRad)) is int:
