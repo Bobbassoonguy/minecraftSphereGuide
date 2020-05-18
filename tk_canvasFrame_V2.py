@@ -101,7 +101,7 @@ class SquareDispCanvas:
         master.columnconfigure(0, weight=1)  # TODO move this out of class
 
         # Create resizing canvas
-        self.canvas = ResizingCanvas(self.frame, width=radius * 10, height=radius * 10, bg="white",
+        self.canvas = ResizingCanvas(self.frame, width=radius * 15, height=radius * 15, bg="white",
                                      highlightthickness=0)
         self.canvas.grid(row=0, column=0, sticky=NSEW)
         self.frame.columnconfigure(0, weight=1)
