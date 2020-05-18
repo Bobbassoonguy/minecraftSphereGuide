@@ -118,7 +118,7 @@ class parameterFrame:
                 self.layerEntry.delete(0, len(self.layerEntry.get()))
                 self.layerEntry.insert(0, str(-1))
                 dispLayer()
-            elif currentLayer > -1*radius:
+            elif currentLayer > -1*currentRadius:
                 self.layerEntry.delete(0, len(self.layerEntry.get()))
                 self.layerEntry.insert(0, str(int(currentLayer-1)))
                 dispLayer()
@@ -134,6 +134,7 @@ def createTitle():
     topLabel.grid(row=0)
 
 def updateRad():
+    global radius
     newRadius = pFrame.getR()
     if newRadius is not None:
         print("Radius Updated")
@@ -143,6 +144,7 @@ def updateRad():
         sphere = sphereFormatted(radius)
 
         canv.updateRadius(radius)
+        print(radius)
         dispLayer()
 
 def dispLayer():
@@ -152,10 +154,15 @@ def dispLayer():
             newLayer = 1
         print("Layer Updated")
         canv.removeRectangles()
+        print(radius)
         if newLayer != -1*radius:
             layer2 = newLayer-1-(int)(newLayer/abs(newLayer))
             layer2 = abs(layer2)
             canv.drawTheseRectangles(sphere[layer2], "green")
+        if newLayer != radius:
+            layer3 = newLayer+1-(int)(newLayer/abs(newLayer))
+            layer3 = abs(layer3)
+            canv.drawTheseRectangles(sphere[layer3], "blue")
         newLayer -= (int)(newLayer/abs(newLayer))
         newLayer = abs(newLayer)
         canv.drawTheseRectangles(sphere[newLayer])
