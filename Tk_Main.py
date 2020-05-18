@@ -17,7 +17,7 @@ class parameterFrame:
         self.defaultR = defaultR
 
         # Create display frame
-        self.frame = Frame(self.master, bg="red")
+        self.frame = Frame(self.master)
         self.frame.grid(row=1, sticky=NSEW) # TODO move this out of class
 
         self.rframe()
@@ -27,7 +27,7 @@ class parameterFrame:
         self.canvFrame = canv
 
     def rframe(self):
-        self.radiusFrame = Frame(self.frame, bg="blue") # TODO Remove background
+        self.radiusFrame = Frame(self.frame, relief=RIDGE, bd=4)
         self.radiusFrame.grid(column=0,row=0, sticky=NW)  # TODO move this out of class
 
         radiusEntryLabel = Label(self.radiusFrame, text="Radius:", font=SUBLABEL_FONT)
@@ -41,18 +41,24 @@ class parameterFrame:
         self.radiusUpdateButton.grid(row=1,column=1,sticky=W)
 
     def lframe(self):
-        self.layerFrame = Frame(self.frame, bg="yellow")  # TODO Remove background
+        self.layerFrame = Frame(self.frame, relief=RIDGE, bd=4)
         self.layerFrame.grid(column=1,row=0, sticky=N)  # TODO move this out of class
 
         layerEntryLabel = Label(self.layerFrame, text="Layer:", font=SUBLABEL_FONT)
         layerEntryLabel.grid(row=0, sticky=W)
 
+        self.layerAddButton = Button(self.layerFrame, text="  +  ", command=self.add1L)
+        self.layerAddButton.grid(row=0, column=1, sticky=EW)
+
+        self.layerSubtractButton = Button(self.layerFrame, text="  -  ", command=self.sub1L)
+        self.layerSubtractButton.grid(row=0, column=2, sticky=EW)
+
         self.layerEntry = Entry(self.layerFrame, width=7)
         self.layerEntry.grid(row=1, sticky=W)
-        self.layerEntry.insert(0, "0")
+        self.layerEntry.insert(0, "1")
 
         self.layerUpdateButton = Button(self.layerFrame, text="Update", command=dispLayer)
-        self.layerUpdateButton.grid(row=1, column=1, sticky=W)
+        self.layerUpdateButton.grid(row=1, column=1, columnspan=2, sticky=W)
 
     def getR(self):
         rad = int(self.radiusEntry.get())
@@ -68,6 +74,24 @@ class parameterFrame:
         else:
             return layer
 
+    def add1L(self):
+        currentLayer = self.getL()
+        currentRadius = self.getR()
+        if currentLayer is not None and currentRadius is not None:
+            if currentLayer < currentRadius:
+                self.layerEntry.delete(0, len(self.layerEntry.get()))
+                self.layerEntry.insert(0, str(1+int(currentLayer)))
+                dispLayer()
+
+    def sub1L(self):
+        currentLayer = self.getL()
+        currentRadius = self.getR()
+        if currentLayer is not None and currentRadius is not None:
+            if currentLayer > 1:
+                self.layerEntry.delete(0, len(self.layerEntry.get()))
+                self.layerEntry.insert(0, str(int(currentLayer)-1))
+                dispLayer()
+
 
 
 
@@ -82,11 +106,18 @@ def updateRad():
     newRadius = pFrame.getR()
     if newRadius is not None:
         print("Radius Updated")
-        canv.updateRadius(newRadius)
+        radius = newRadius
+
+        global sphere
+        sphere = sphereFormatted(radius)
+
+        canv.updateRadius(radius)
+        dispLayer()
 
 def dispLayer():
     newLayer = pFrame.getL()
     if newLayer is not None:
+        newLayer -= 1
         print("Layer Updated")
         canv.removeRectangles()
         canv.drawTheseRectangles(sphere[newLayer])
@@ -98,16 +129,12 @@ root.title("Sphere Calculator")
 
 createTitle()
 
-radius = 64
-Layer = 0
+radius = 32
+Layer = 1
 
 pFrame = parameterFrame(defaultR=radius)
 canv = canvFrame.SquareDispCanvas(root, radius)
 updateRad()
-
-sphere = sphereFormatted(radius)
-
-dispLayer()
 
 
 

@@ -92,7 +92,7 @@ class SquareDispCanvas:
         self.gridSize = [radius, radius]
 
         # Create display frame
-        self.frame = Frame(self.master, bg="green")
+        self.frame = Frame(self.master, relief=SUNKEN, bd=4)
         self.frame.grid(row=2, sticky=NSEW) # TODO move this out of class
         master.rowconfigure(2, weight=1)  # TODO move this out of class
         master.columnconfigure(0, weight=1)  # TODO move this out of class
@@ -198,7 +198,7 @@ class SquareDispCanvas:
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
 
         x = x * squareSize[0]
-        y = self.canvas.height - (y * squareSize[1])
+        y = self.canvas.height - ((y+1) * squareSize[1])
 
         return [x, y]
 
@@ -217,7 +217,8 @@ class SquareDispCanvas:
 
     def drawTheseRectangles(self, coords,color="red"):
         for pair in coords:
-            self.drawRect(pair,small=False,color=color)
+            if pair[0] >= 0 and pair[1] >= 0:
+                self.drawRect(pair,small=False,color=color)
 
     def updateRadius(self, newRad):
         if type(int(newRad)) is int:
@@ -225,8 +226,6 @@ class SquareDispCanvas:
             self.gridSize = [newRad, newRad]
             self.canvas.clearAll()
             self.canvas.config(width=newRad*10, height=newRad*10)
-
-            # self.drawThisSphere(newRad)
 
             self.drawCanvasGrid()
             self.drawCanvasAxes()
