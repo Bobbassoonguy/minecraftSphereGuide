@@ -150,10 +150,14 @@ def dispLayer():
     if newLayer is not None:
         if newLayer == 0:
             newLayer = 1
-        newLayer -= (int)(newLayer/abs(newLayer))
-        newLayer = abs(newLayer)
         print("Layer Updated")
         canv.removeRectangles()
+        if newLayer != -1*radius:
+            layer2 = newLayer-1-(int)(newLayer/abs(newLayer))
+            layer2 = abs(layer2)
+            canv.drawTheseRectangles(sphere[layer2], "green")
+        newLayer -= (int)(newLayer/abs(newLayer))
+        newLayer = abs(newLayer)
         canv.drawTheseRectangles(sphere[newLayer])
 
 def rotateCW():
