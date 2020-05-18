@@ -144,7 +144,6 @@ def updateRad():
         sphere = sphereFormatted(radius)
 
         canv.updateRadius(radius)
-        print(radius)
         dispLayer()
 
 def dispLayer():
@@ -154,7 +153,6 @@ def dispLayer():
             newLayer = 1
         print("Layer Updated")
         canv.removeRectangles()
-        print(radius)
         if newLayer != -1*radius:
             layer2 = newLayer-1-(int)(newLayer/abs(newLayer))
             layer2 = abs(layer2)
