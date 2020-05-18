@@ -2,7 +2,9 @@ from tkinter import *
 import colorsys
 from Carson_Logic import sphereFormatted
 
-def RGB(red,green,blue): return '#%02x%02x%02x' % (red,green,blue)
+
+def RGB(red, green, blue): return '#%02x%02x%02x' % (red, green, blue)
+
 
 def drawRainbow(rad):
     rainbowList = []
@@ -94,18 +96,21 @@ class SquareDispCanvas:
 
         # Create display frame
         self.frame = Frame(self.master, relief=SUNKEN, bd=4)
-        self.frame.grid(row=2, sticky=NSEW) # TODO move this out of class
+        self.frame.grid(row=2, sticky=NSEW)  # TODO move this out of class
         master.rowconfigure(2, weight=1)  # TODO move this out of class
         master.columnconfigure(0, weight=1)  # TODO move this out of class
 
         # Create resizing canvas
-        self.canvas = ResizingCanvas(self.frame, width=radius*10, height=radius*10, bg="white", highlightthickness=0)
+        self.canvas = ResizingCanvas(self.frame, width=radius * 10, height=radius * 10, bg="white",
+                                     highlightthickness=0)
         self.canvas.grid(row=0, column=0, sticky=NSEW)
         self.frame.columnconfigure(0, weight=1)
         self.frame.rowconfigure(0, weight=1)
 
         self.canvasScrolling()
         self.canvasZoomButtons()
+
+        self.canvas.tag_bind("rectangle", '<Enter>', self.onRectEnter)
 
 
     def drawCanvasGrid(self):
@@ -137,7 +142,6 @@ class SquareDispCanvas:
             xAxis = self.canvas.create_line(0, 0, canvasWidth, 0, width=axisWidth, fill="red")
         elif self.originLoc == "NE":
             print("No Axes")
-
 
         # if type(self.gridSize[0]) is int:
         #     print("X is int")
@@ -223,10 +227,10 @@ class SquareDispCanvas:
             y = self.canvas.height - ((y + 1) * squareSize[1])
         elif self.originLoc == "NW":
             x = x * squareSize[0]
-            y = ((-1 * (y+1)) * squareSize[1])
+            y = ((-1 * (y + 1)) * squareSize[1])
         elif self.originLoc == "NE":
             x = canvasWidth + (x * squareSize[0])
-            y = ((-1 * (y+1)) * squareSize[1])
+            y = ((-1 * (y + 1)) * squareSize[1])
 
         return [x, y]
 
@@ -235,15 +239,17 @@ class SquareDispCanvas:
         canvasWidth = self.canvas.width
         squareSize = [canvasWidth / self.gridSize[0], canvasHeight / self.gridSize[1]]
 
-        coords = self.gridToCanvCoords(coords)
+        CanvCoords = self.gridToCanvCoords(coords)
 
         border = .5
         if small:
             border = 3
 
-        self.canvas.create_rectangle(coords[0] + border, coords[1] + border, (coords[0] + squareSize[0]) - border, (coords[1] + squareSize[1]) - border, fill=color, width=0,tags="rectangle")
+        self.canvas.create_rectangle(CanvCoords[0] + border, CanvCoords[1] + border, (CanvCoords[0] + squareSize[0]) - border,
+                                     (CanvCoords[1] + squareSize[1]) - border, fill=color, width=0, tags=("rectangle",("x"+str(coords[0])), ("y"+str(coords[1]))),
+                                     activestipple="gray75")
 
-    def drawTheseRectangles(self, coords,color="red"):
+    def drawTheseRectangles(self, coords, color="red"):
 
         for pair in coords:
             if self.originLoc == "SW":
@@ -259,16 +265,28 @@ class SquareDispCanvas:
                 if pair[0] <= 0 and pair[1] <= 0:
                     self.drawRect(pair, small=False, color=color)
 
-
     def updateRadius(self, newRad):
         if type(int(newRad)) is int:
             newRad = int(newRad)
             self.gridSize = [newRad, newRad]
             self.canvas.clearAll()
-            self.canvas.config(width=newRad*10, height=newRad*10)
+            self.canvas.config(width=newRad * 10, height=newRad * 10)
 
             self.drawCanvasGrid()
             self.drawCanvasAxes()
 
     def removeRectangles(self):
         self.canvas.delete("rectangle")
+
+    def onRectEnter(self, event):
+        print('Got object Enter', event.x, event.y)
+        overlapping = event.widget.find_overlapping(event.x+1, event.y+1,event.x-1, event.y-1)
+        foundRectangle = False
+        for i in overlapping:
+            tags = event.widget.gettags(i)
+            if "rectangle" in tags:
+                print(tags)
+                foundRectangle = True
+                break
+        if not foundRectangle:
+            print("No rectangle found")
