@@ -168,16 +168,20 @@ def dispLayer():
             newLayer = 1
         print("Layer Updated")
         canv.removeRectangles()
+        layer2 = 0
+        layer3 = 0
+        if newLayer != -1*radius and belowDisp:
+            layer2 = newLayer-1-(int)(newLayer/abs(newLayer))
+            layer2 = abs(layer2)
+        if newLayer != radius and aboveDisp:
+            layer3 = newLayer+1-(int)(newLayer/abs(newLayer))
+            layer3 = abs(layer3)
         newLayer -= (int)(newLayer/abs(newLayer))
         newLayer = abs(newLayer)
         canv.drawTheseRectangles(sphere[newLayer])
-        if newLayer != -1*radius and belowDisp:
-            layer2 = newLayer-1
-            layer2 = abs(layer2)
+        if newLayer != -1*radius and belowDisp and layer2 != 0:
             canv.drawTheseRectangles(sphere[layer2], "green",stippled="ALWAYS")
-        if newLayer != radius and aboveDisp:
-            layer3 = newLayer+1
-            layer3 = abs(layer3)
+        if newLayer != radius and aboveDisp and layer3 != 0:
             canv.drawTheseRectangles(sphere[layer3], "blue",stippled="ALWAYS")
 
 def rotateCW():
