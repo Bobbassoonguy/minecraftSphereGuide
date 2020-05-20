@@ -27,13 +27,14 @@ class ResizingCanvas(Canvas):
 
         self.height = self.winfo_reqheight()
         self.width = self.winfo_reqwidth()
+        self.suppressResize = False
 
         self.scrollregion = (0, 0, self.width, self.height)
 
     def on_resize(self, event):
         # determine the ratio of old width/height to new width/height
         if (round(event.width) != round(self.width) or round(event.height) != round(
-                self.height)) and not self.supressResize:
+                self.height)) and not self.suppressResize:
             if event.width > event.height:
                 # print("Window wide")
                 scale = float(event.width) / self.width
@@ -50,10 +51,10 @@ class ResizingCanvas(Canvas):
             self.scale("all", 0, 0, scale, scale)
 
             print("resized:", self.width, ",", self.height, self.scrollregion)
-        self.supressResize = False
+        self.suppressResize = False
 
     def zoom(self, scale):  # TODO figure out why before window is ever resized, zoom changes window size
-        self.supressResize = True
+        self.suppressResize = True
 
         # determine the ratio of old width/height to new width/height
         self.width = round(self.width * scale)
